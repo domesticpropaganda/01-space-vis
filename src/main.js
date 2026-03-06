@@ -36,7 +36,6 @@ createControls({
 
 // Start the state-driven animation timeline
 startStateTimeline(silhouettes, screen, planes, desk)
-silhouettes.startRoaming()
 
 // Resize handling
 window.addEventListener('resize', onResize)

@@ -36,15 +36,17 @@ export function startStateTimeline(silhouettes, screen, planes, desk) {
   const tl = gsap.timeline({ repeat: -1, defaults: { ease } })
 
   // ── Desk — scales up from floor at t=2, collapses at t=44 ───────────────
-  tl.call(() => { desk.group.visible = true }, [], 2)
-  tl.to(desk.group.scale, { y: 1, duration: 1.5, ease: 'power2.out' }, 2)
+  tl.call(() => { desk.group.visible = true }, [], 5)
+  tl.to(desk.group.scale, { y: 1, duration: 1.5, ease: 'power2.out' }, 5)
+  tl.to(sils[36].material, { opacity: 1, duration: 1.5, ease: 'power2.out' }, 5.5)
+  tl.to(sils[36].material, { opacity: 0, duration: 1, ease: 'power2.in' }, 44)
   tl.to(desk.group.scale, { y: 0, duration: 1.5, ease: 'power2.in' }, 44)
   tl.call(() => { desk.group.visible = false }, [], 45.5)
 
   // ── FORWARD PASS ─────────────────────────────────────────────────────────────
 
   // ── t=5  LARGE → MEDIUM ───────────────────────────────────────────────────
-  staggerIn(tl, sils, 6, 18, 5, 2.5)
+  trickleIn(tl, sils, 6, 18, 5, 7)
   tl.to(maxHeaderMat,    { opacity: 0, duration: 1 }, 7)
   tl.to(mediumHeaderMat, { opacity: 1, duration: 1 }, 7)
   tl.to(maxCardsMat,     { opacity: 0, duration: 1 }, 7 + CD)
@@ -59,7 +61,7 @@ export function startStateTimeline(silhouettes, screen, planes, desk) {
   tl.to(allPlanes[2].contentMats.medium, { opacity: 1, duration: 1.5 }, 8)
 
   // ── t=13  MEDIUM → MANY ───────────────────────────────────────────────────
-  staggerIn(tl, sils, 18, 24, 13, 2.5)
+  trickleIn(tl, sils, 18, 24, 13, 5)
   tl.to(mediumHeaderMat,  { opacity: 0, duration: 1 }, 14.5)
   tl.to(minimalHeaderMat, { opacity: 1, duration: 1 }, 14.5)
   tl.to(mediumCardsMat,   { opacity: 0, duration: 1 }, 14.5 + CD)
@@ -78,7 +80,7 @@ export function startStateTimeline(silhouettes, screen, planes, desk) {
   tl.to(allPlanes[2].contentMats.small,  { opacity: 1, duration: 1.5 }, 15.5)
 
   // ── t=20  MANY → XSMALL ───────────────────────────────────────────────────
-  staggerIn(tl, sils, 24, 36, 20, 2.5)
+  trickleIn(tl, sils, 24, 36, 20, 5)
   tl.to(minimalHeaderMat, { opacity: 0, duration: 1 }, 21.5)
   tl.to(xsmallHeaderMat,  { opacity: 1, duration: 1 }, 21.5)
   tl.to(minimalCardsMat,  { opacity: 0, duration: 1 }, 21.5 + CD)
@@ -95,7 +97,7 @@ export function startStateTimeline(silhouettes, screen, planes, desk) {
   // ── REVERSE PASS ─────────────────────────────────────────────────────────────
 
   // ── t=27  XSMALL → MANY ───────────────────────────────────────────────────
-  staggerOut(tl, sils, 24, 36, 27, 2.5)
+  trickleOut(tl, sils, 24, 36, 27, 6)
   // sils finish at t=32.75 → screen reacts at t=31 (slight overlap, intentional)
   tl.to(xsmallHeaderMat,  { opacity: 0, duration: 1 }, 31)
   tl.to(minimalHeaderMat, { opacity: 1, duration: 1 }, 31)
@@ -111,7 +113,7 @@ export function startStateTimeline(silhouettes, screen, planes, desk) {
   tl.to(allPlanes[2].contentMats.small,   { opacity: 1, duration: 1.5 }, 32)
 
   // ── t=35  MANY → MEDIUM ───────────────────────────────────────────────────
-  staggerOut(tl, sils, 18, 24, 35, 2.5)
+  trickleOut(tl, sils, 18, 24, 35, 6)
   // sils finish at t=38.75 → screen reacts at t=39 (state boundary)
   tl.to(minimalHeaderMat, { opacity: 0, duration: 1 }, 39)
   tl.to(mediumHeaderMat,  { opacity: 1, duration: 1 }, 39)
@@ -131,7 +133,7 @@ export function startStateTimeline(silhouettes, screen, planes, desk) {
   tl.to(allPlanes[2].contentMats.medium, { opacity: 1, duration: 1.5 }, 40)
 
   // ── t=44  MEDIUM → LARGE ──────────────────────────────────────────────────
-  staggerOut(tl, sils, 6, 18, 44, 2.5)
+  trickleOut(tl, sils, 6, 18, 44, 8)
   // sils finish at t=47.75 → screen reacts at t=48 (state boundary)
   tl.to(mediumHeaderMat, { opacity: 0, duration: 1 }, 48)
   tl.to(maxHeaderMat,    { opacity: 1, duration: 1 }, 48)
@@ -152,14 +154,38 @@ export function startStateTimeline(silhouettes, screen, planes, desk) {
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-function staggerIn(tl, meshes, start, end, startTime, dur, stagger = 0.25) {
-  meshes.slice(start, end).forEach((m, j) => {
-    tl.to(m.material, { opacity: 1, duration: dur, ease: 'power2.out' }, startTime + j * stagger)
+// Groups silhouettes into batches of [1, 2, 3, 1, 2, 3, …] spread across windowDur.
+function trickleIn(tl, meshes, start, end, startTime, windowDur, fadeDur = 1.5) {
+  const batches = makeBatches(start, end)
+  const gap = windowDur / batches.length
+  batches.forEach((batch, i) => {
+    batch.forEach((idx, k) => {
+      tl.to(meshes[idx].material, { opacity: 1, duration: fadeDur, ease: 'power2.out' },
+            startTime + i * gap + k * 0.15)
+    })
   })
 }
 
-function staggerOut(tl, meshes, start, end, startTime, dur, stagger = 0.25) {
-  meshes.slice(start, end).forEach((m, j) => {
-    tl.to(m.material, { opacity: 0, duration: dur, ease: 'power2.in' }, startTime + j * stagger)
+function trickleOut(tl, meshes, start, end, startTime, windowDur, fadeDur = 1.5) {
+  const batches = makeBatches(start, end)
+  const gap = windowDur / batches.length
+  batches.forEach((batch, i) => {
+    batch.forEach((idx, k) => {
+      tl.to(meshes[idx].material, { opacity: 0, duration: fadeDur, ease: 'power2.in' },
+            startTime + i * gap + k * 0.15)
+    })
   })
+}
+
+function makeBatches(start, end) {
+  const count = end - start
+  const batches = []
+  let added = 0, bi = 0
+  while (added < count) {
+    const size = Math.min(1 + (bi % 3), count - added)
+    batches.push(Array.from({ length: size }, (_, k) => start + added + k))
+    added += size
+    bi++
+  }
+  return batches
 }

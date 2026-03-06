@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import gsap from 'gsap'
 import { SVGLoader } from 'three/addons/loaders/SVGLoader.js'
 import { scene } from './scene.js'
 import { COLORS } from './colors.js'
@@ -46,13 +45,11 @@ const POSITIONS = [
   [ 3.20, -2.5, -3.0],
   [-3.50, -2.5, -3.4],
   [ 2.00, -2.5, -3.7],
-  // ── Roamers: initial positions (overwritten each cycle) ──────────────────────
-  [ 0, -2.5, 1.0],
-  [ 0, -2.5, 1.0],
-  [ 0, -2.5, 1.0],
+  // ── Desk staff: behind the desk, appears with it ─────────────────────────
+  [ 0.00, -2.5, -3.75],
 ]
 
-const HEIGHTS = Array(39).fill(2.5)
+const HEIGHTS = Array(37).fill(2.5)
 
 export function createSilhouettes() {
   const loader = new SVGLoader()
@@ -60,21 +57,24 @@ export function createSilhouettes() {
   const fillMats = []
   const outlineMats = []
 
+  const DESK_STAFF = POSITIONS.length - 1  // last entry — behind the desk
+
   POSITIONS.forEach((_, i) => {
+    const staff = i === DESK_STAFF
     fillMats.push(new THREE.MeshBasicMaterial({
       color: COLORS.silhouetteFill,
       transparent: true,
       opacity: i < 6 ? 1 : 0,
       side: THREE.DoubleSide,
       depthWrite: false,
-      depthTest: false,
+      depthTest: staff,   // staff lets the desk occlude them
     }))
     outlineMats.push(new THREE.LineBasicMaterial({
       color: COLORS.silhouetteOutline,
       transparent: true,
       opacity: i < 6 ? 0.8 : 0,
       depthWrite: false,
-      depthTest: false,
+      depthTest: staff,
     }))
   })
 
@@ -144,32 +144,5 @@ export function createSilhouettes() {
     setFillColor(v)    { fillMats.forEach(m => m.color.set(v)) },
     setOutlineColor(v) { outlineMats.forEach(m => m.color.set(v)) },
 
-    startRoaming() {
-      const ROAMER_INDICES = [36, 37, 38]
-      ROAMER_INDICES.forEach((idx, k) => {
-        const h    = HEIGHTS[idx]
-        const pmat = meshes[idx].material  // proxy — syncs fill + outline
-
-        function cycle() {
-          // Reposition while invisible
-          const x = -4.0 + Math.random() * 8.0
-          const z = -2.0 + Math.random() * 5.5
-          groups[idx].position.set(x, -2.5 + h / 2, z)
-          groups[idx].visible = true
-
-          const holdDur = 2 + Math.random() * 3
-          const waitDur = 1 + Math.random() * 2
-
-          gsap.timeline()
-            .to(pmat, { opacity: 1, duration: 1.5, ease: 'power2.inOut' })
-            .to(pmat, { opacity: 1, duration: holdDur })
-            .to(pmat, { opacity: 0, duration: 1.5, ease: 'power2.inOut' })
-            .call(() => gsap.delayedCall(waitDur, cycle))
-        }
-
-        // Stagger first appearance so the 3 roamers don't sync up
-        gsap.delayedCall(k * 2.5 + Math.random() * 2, cycle)
-      })
-    },
   }
 }

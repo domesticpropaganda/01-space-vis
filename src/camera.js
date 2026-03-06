@@ -3,7 +3,7 @@ import { SCREEN_POS } from './screen.js'
 
 export const CAM_PARAMS = {
   orbitX: 4.5,   // max lateral offset
-  baseY:  1.4,   // camera height
+  baseY:  1.6,   // camera height
   swayY:  0.2,   // vertical sway amplitude
   camZ:   11.0,   // camera depth
 }
