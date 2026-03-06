@@ -11,7 +11,7 @@ export const COLORS = {
 
   screenBg:     '#303030',
   screenBorder: '#949494',
-  screenUI:     '#8894a0',
+  screenUI:     '#b0b893', //was #b0b894
 
   planeFill:    '#a6a6a6',
   planeWire:    '#bababa',
