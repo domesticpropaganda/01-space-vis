@@ -61,8 +61,10 @@ export function createSilhouettes() {
 
   POSITIONS.forEach((_, i) => {
     const staff = i === DESK_STAFF
+    const v = Math.floor(69 + Math.random() * 21)  // 69–89 in sRGB
+    const col = (v << 16) | (v << 8) | v            // e.g. 0x454545–0x595959
     fillMats.push(new THREE.MeshBasicMaterial({
-      color: COLORS.silhouetteFill,
+      color: col,
       transparent: true,
       opacity: i < 6 ? 1 : 0,
       side: THREE.DoubleSide,
