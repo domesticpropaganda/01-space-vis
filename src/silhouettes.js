@@ -51,8 +51,8 @@ const POSITIONS = [
 
 const HEIGHTS = Array(37).fill(2.5)
 
-export function createSilhouettes() {
-  const loader = new SVGLoader()
+export function createSilhouettes(manager) {
+  const loader = new SVGLoader(manager)
   const groups = []
   const fillMats = []
   const outlineMats = []

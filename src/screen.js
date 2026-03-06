@@ -14,7 +14,7 @@ const SCALE = SW / 1920  // ≈ 0.00311
 // SVG content sits just in front of the screen plane
 const Z = 0.025
 
-export function createScreen() {
+export function createScreen(manager) {
   const group = new THREE.Group()
   group.position.copy(SCREEN_POS)
   scene.add(group)
@@ -52,7 +52,7 @@ export function createScreen() {
     { mats: [xsmallHeaderMat,  xsmallCardsMat ], files: ['header-xsmall', 'cards-xsmall' ] },
   ]
 
-  const loader = new SVGLoader()
+  const loader = new SVGLoader(manager)
 
   STATES.forEach(({ mats, files }) => {
     const stateGroup = new THREE.Group()

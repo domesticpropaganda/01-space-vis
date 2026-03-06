@@ -40,11 +40,11 @@ const CONTENT_DEFS = {
   3: [{ url: `${BASE}images/side-3x1-xsmall-right.svg`, key: 'xsmall', svgW: 600, svgH: 200 }],
 }
 
-const svgLoader = new SVGLoader()
-
 const planes = []
 const annoMats = []
 const svgContentMats = []
+
+let svgLoader
 
 function attachSvgContent(group, gw, gh, entries) {
   // Solid background that matches the screen fill — fades in with content
@@ -95,7 +95,8 @@ function attachSvgContent(group, gw, gh, entries) {
   return contentMats
 }
 
-export function createPlanes() {
+export function createPlanes(manager) {
+  svgLoader = new SVGLoader(manager)
   DEFS.forEach((def, i) => {
     const group = new THREE.Group()
 
