@@ -103,7 +103,7 @@ export function createSilhouettes() {
     scene.add(group)
     groups.push(group)
 
-    loader.load(`/images/S${i % 18}.svg`, (data) => {
+    loader.load(`${import.meta.env.BASE_URL}images/S${i % 18}.svg`, (data) => {
       const vb = data.xml?.getAttribute('viewBox')?.split(' ').map(Number)
       const svgW = vb?.[2] ?? 62
       const svgH = vb?.[3] ?? 268

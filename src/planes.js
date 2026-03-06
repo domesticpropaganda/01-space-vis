@@ -25,17 +25,19 @@ const DEFS = [
 
 // SVG content shown on side-wall planes per animation state
 // key must match what state.js reads from plane.contentMats
+const BASE = import.meta.env.BASE_URL
+
 const CONTENT_DEFS = {
   0: [
-    { url: '/images/side-2x3-medium-left.svg', key: 'medium', svgW: 400, svgH: 600 },
-    { url: '/images/side-2x3-small-left.svg',  key: 'small',  svgW: 400, svgH: 600 },
+    { url: `${BASE}images/side-2x3-medium-left.svg`, key: 'medium', svgW: 400, svgH: 600 },
+    { url: `${BASE}images/side-2x3-small-left.svg`,  key: 'small',  svgW: 400, svgH: 600 },
   ],
-  1: [{ url: '/images/side-3x1-xsmall-left.svg',  key: 'xsmall', svgW: 600, svgH: 200 }],
+  1: [{ url: `${BASE}images/side-3x1-xsmall-left.svg`,  key: 'xsmall', svgW: 600, svgH: 200 }],
   2: [
-    { url: '/images/side-2x3-medium-right.svg', key: 'medium', svgW: 400, svgH: 600 },
-    { url: '/images/side-2x3-small-right.svg',  key: 'small',  svgW: 400, svgH: 600 },
+    { url: `${BASE}images/side-2x3-medium-right.svg`, key: 'medium', svgW: 400, svgH: 600 },
+    { url: `${BASE}images/side-2x3-small-right.svg`,  key: 'small',  svgW: 400, svgH: 600 },
   ],
-  3: [{ url: '/images/side-3x1-xsmall-right.svg', key: 'xsmall', svgW: 600, svgH: 200 }],
+  3: [{ url: `${BASE}images/side-3x1-xsmall-right.svg`, key: 'xsmall', svgW: 600, svgH: 200 }],
 }
 
 const svgLoader = new SVGLoader()

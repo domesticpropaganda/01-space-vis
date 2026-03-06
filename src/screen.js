@@ -60,7 +60,7 @@ export function createScreen() {
 
     files.forEach((name, fi) => {
       const mat = mats[fi]
-      loader.load(`/images/${name}.svg`, (data) => {
+      loader.load(`${import.meta.env.BASE_URL}images/${name}.svg`, (data) => {
         // Transform group: scale SVG px → world units, flip Y, center on screen origin
         const tg = new THREE.Group()
         tg.scale.set(SCALE, -SCALE, 1)
