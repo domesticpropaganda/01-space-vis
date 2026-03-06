@@ -23,7 +23,7 @@ export const COLORS = {
 }
 
 export const BLOOM = {
-  strength:  0.2,
+  strength:  0.4,
   threshold: 0.18,
   radius:    0,
 }

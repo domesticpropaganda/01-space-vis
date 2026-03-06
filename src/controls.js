@@ -9,7 +9,7 @@ export function createControls({ scene, bloomPass, grainPass, envMats, planeMats
   const sceneF = gui.addFolder('Scene')
   const sceneP = { background: COLORS.background }
   sceneF.addColor(sceneP, 'background').name('Background').onChange(v => scene.background.set(v))
-
+sceneF.close()
   // ── Environment ────────────────────────────────────────────────────────────
   const envF = gui.addFolder('Environment')
   const envP = { grid: COLORS.grid, structure: COLORS.structure }
